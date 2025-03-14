@@ -30,9 +30,17 @@ jobs:
     runs-on: ubuntu-latest 
     environment: dev
     steps:
+      - name: Dockerfile image - Ecr
+        uses: actions/checkout@2
 
   staging:
     needs: dev
+    steps:
+      - name: Dockerfile image - Ecr
+        uses: actions/checkout@2
 
   prod:
     needs: staging
+    steps:
+      - name: Dockerfile image - Ecr
+        uses: actions/checkout@2
