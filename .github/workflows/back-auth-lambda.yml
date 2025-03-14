@@ -1,0 +1,38 @@
+name: API AUTH SERVICE
+
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "back/auth/**"
+
+defaults:
+  run:
+    working-directory: back/auth
+
+
+env: 
+  STACK_NAME: api-auth
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  SERVICE_ROLE: "lambda.amazonaws.com"
+  LAMBDA_DESCRIPTION: "lambda ...."
+  ECR_REPOSITORY: "auth-ecr"
+
+
+jobs:
+  dev:
+    name: Environment Dev
+    runs-on: ubuntu-latest 
+    environment: dev
+    steps:
+
+  staging:
+    needs: dev
+
+  prod:
+    needs: staging
