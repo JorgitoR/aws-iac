@@ -28,7 +28,7 @@ jobs:
   dev:
     name: Environment Dev
     runs-on: ubuntu-latest 
-    environment: dev
+    environment: development
     steps:
     - name: Checkout
       uses: actions/checkout@v2
