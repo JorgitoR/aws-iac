@@ -17,4 +17,12 @@ switch(env) {
         region: "us-east-1"
       }
     })
+
+  case 's3':
+    const s3 = new LambdaCdk(app, "lambda-production", {
+      env:{
+        account: "273354645944",
+        region: "us-east-1"
+      }
+    })
 }
