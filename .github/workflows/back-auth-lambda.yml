@@ -19,7 +19,7 @@ env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   SERVICE_ROLE: "lambda.amazonaws.com"
-  LAMBDA_NAME: "PYTHON AUTH 🥳"
+  LAMBDA_NAME: "PYTHON AUTH "
   LAMBDA_DESCRIPTION: "lambda ...."
   ECR_REPOSITORY: "aws-mentorship"
 
