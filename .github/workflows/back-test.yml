@@ -1,0 +1,64 @@
+name: Auth Lambda
+
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "back/auth/**"
+
+defaults:
+  run:
+    working-directory: back/auth
+
+env:
+  STACK_NAME: auth-microservice-lambda
+  LAMBDA_CONFIG_URI: LambdaConfigPython
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  SERVICE_ROLE: "lambda.amazonaws.com"
+  LAMBDA_DESCRIPTION: "Auth microservice"
+  LAMBDA_NAME: AUTH-MICROSERVICE
+  ECR_REPOSITORY_DEV: auth-lambda-dev
+
+jobs:
+  dev:
+    name: Environment Dev
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set Tag Number
+        id: tag-number
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Check Tag Release
+        env:
+          RELEASE_VERSION: ${{ steps.tag-number.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
+      - name: Configure AWS credentials from dev account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN_NONPROD }}
+          aws-region: ${{ env.AWS_REGION }}
+        
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_DEV }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push -a $ECR_REGISTRY/$ECR_REPOSITORY
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
